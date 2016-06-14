@@ -26,8 +26,8 @@
 namespace ORB_SLAM2
 {
 
-Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, Tracking *pTracking, const string &strSettingPath):
-    mpSystem(pSystem), mpFrameDrawer(pFrameDrawer),mpMapDrawer(pMapDrawer), mpTracker(pTracking),
+Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, CubeDrawer* pCubeDrawer, Tracking *pTracking, const string &strSettingPath):
+    mpSystem(pSystem), mpFrameDrawer(pFrameDrawer),mpMapDrawer(pMapDrawer), mpCubeDrawer(pCubeDrawer), mpTracker(pTracking),
     mbFinishRequested(false), mbFinished(true), mbStopped(false), mbStopRequested(false)
 {
     cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
@@ -69,7 +69,9 @@ void Viewer::Run()
     pangolin::Var<bool> menuShowPoints("menu.Show Points",true,true);
     pangolin::Var<bool> menuShowKeyFrames("menu.Show KeyFrames",true,true);
     pangolin::Var<bool> menuShowGraph("menu.Show Graph",true,true);
-    pangolin::Var<bool> menuLocalizationMode("menu.Localization Mode",false,true);
+    pangolin::Var<bool> menuLocalizationMode("menu.Localization Mode",false,true);    
+    pangolin::Var<int>  menuMapPointIndex("menu.Select Map Point",2,1,1000);
+    pangolin::Var<bool> menuUpdateMapPoints("menu.Update Points",false,false);
     pangolin::Var<bool> menuReset("menu.Reset",false,false);
 
     // Define Camera Render Object (for view / scene browsing)
@@ -131,9 +133,16 @@ void Viewer::Run()
         if(menuShowPoints)
             mpMapDrawer->DrawMapPoints();
 
+        if(menuUpdateMapPoints){
+            mpCubeDrawer->AddNewMapPoint(menuMapPointIndex);
+            menuUpdateMapPoints = false;
+        }
+        mpCubeDrawer->Draw3D();
+        
         pangolin::FinishFrame();
 
         cv::Mat im = mpFrameDrawer->DrawFrame();
+        mpCubeDrawer->Draw2D(im);
         cv::imshow("ORB-SLAM2: Current Frame",im);
         cv::waitKey(mT);
 

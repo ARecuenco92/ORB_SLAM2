@@ -46,7 +46,8 @@ void Map::AddMapPoint(MapPoint *pMP)
 void Map::EraseMapPoint(MapPoint *pMP)
 {
     unique_lock<mutex> lock(mMutexMap);
-    mspMapPoints.erase(pMP);
+    if(std::distance(mspMapPoints.begin(), mspMapPoints.find(pMP)) > 3)
+        mspMapPoints.erase(pMP);
 
     // TODO: This only erase the pointer.
     // Delete the MapPoint

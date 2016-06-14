@@ -114,6 +114,7 @@ cv::Mat FrameDrawer::DrawFrame()
                     cv::circle(im,vCurrentKeys[i].pt,2,cv::Scalar(255,0,0),-1);
                     mnTrackedVO++;
                 }
+                //cv::putText(im,std::to_string(i),vCurrentKeys[i].pt,cv::FONT_HERSHEY_PLAIN,1,cv::Scalar(0,255,0),1,8);
             }
         }
     }
